@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import {predictionResultStore} from "../stores/predictionResultStore";
 
     let canvas: HTMLCanvasElement;
     let coord = {x: 0, y: 0}
@@ -7,22 +8,18 @@
     async function saveImage(canvas: HTMLCanvasElement) {
         let ctx: CanvasRenderingContext2D = canvas.getContext('2d')
 
-        let image:string = canvas.toDataURL()
-        let requestBody = {
-            'image_data': image
-        }
+        let image: string = canvas.toDataURL()
+        let formData: FormData = new FormData()
+        formData.append('image_data', image)
 
-        let response: Response = await fetch('http://localhost:8000', {
+        let response: Response = await fetch('http://localhost:8000/predict/canvas', {
             method: 'POST',
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded'
-            },
-            body: JSON.stringify(requestBody)
+            body: formData
         })
 
-        console.log('Server response')
-        console.log(await response.json())
+        let predictionResult = await response.json()
 
+        predictionResultStore.set(predictionResult)
     }
 
     onMount(() => {
@@ -32,7 +29,7 @@
 
         function draw(event: MouseEvent) {
             ctx.beginPath();
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 28;
             ctx.lineCap = 'round';
             ctx.strokeStyle = 'black';
             ctx.moveTo(coord.x, coord.y);
@@ -71,10 +68,11 @@
 <svelte:window />
 
 <div>
+
     <canvas
             bind:this={canvas}
-            width={512}
-            height={512}
+            width={560}
+            height={560}
     ></canvas>
 
     <button on:click={() => saveImage(canvas)}>Save image</button>
