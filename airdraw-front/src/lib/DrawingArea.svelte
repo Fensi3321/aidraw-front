@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import {predictionResultStore} from "../stores/predictionResultStore";
+    import "../../public/app.css"
 
     let canvas: HTMLCanvasElement;
     let coord = {x: 0, y: 0}
@@ -70,13 +71,21 @@
 <div>
 
     <canvas
+            class='mb-5'
             bind:this={canvas}
             width={560}
             height={560}
     ></canvas>
 
-    <button on:click={() => saveImage(canvas)}>Save image</button>
-</div>
+        <div class="content-center">
+            <button
+            on:click={() => saveImage(canvas)} 
+            class="
+            bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+            Predict
+        </button>
+        </div>
+    </div>
 
 <style>
     canvas { background: #eee; }
